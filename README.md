@@ -1,2 +1,4 @@
 # gravity
-using gravity models to understand foot traffic
+#### using gravity models to understand foot traffic
+
+![](viz/pois.png)
