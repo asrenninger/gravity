@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v3.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<body>
+<svg id="my_dataviz" width="440" height="300"></svg>
+</body>
+<script>
+
+// The svg
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+// Load external data and boot
+d3.json("https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson").then(function(data){
+
+  projection = d3.geoMercator()
+    .fitSize([width, height], data)
+
+    // Draw the map
+    svg.append("g")
+        .selectAll("path")
+        .data(data.features)
+        .enter()
+        .append("path")
+          .attr("fill", "#000")
+          .attr("d", d3.geoPath()
+              .projection(projection)
+          )
+        .style("stroke", "none")
+})
+
+</script>
+</html>
