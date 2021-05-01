@@ -12,14 +12,14 @@
   <link rel="stylesheet" href="css/style.css" />
 
 </head>
-<div class='map' style=" display: flex; justify-content: center; align-items: center;">
-  <svg id='mapped' height="800" width="800"></svg>
+<div class='map' id="base" style=" display: flex; justify-content: center; align-items: center;">
+  <!-- <svg id='mapped' height="800" width="800"></svg> -->
 </div>
 <div class='legendbar'>
-  <h3>
-    Legend
-  </h3>
-  <div class='legendpanel'>
+  <!-- <h3>
+    Visits
+  </h3> -->
+  <div class='legendpanel' id="legend">
   </div>
 </div>
 <div class='sidebar'>
@@ -55,8 +55,10 @@
       Adding <b id='supply'>20</b><b> thousand square feet</b> to block group <b id='block'>421010356014</b> brings 774 new visitors to the neighborhood, an average of 3.4 from each other neighborhood. People traveled 4.9 miles on average to get here.
     </p>
   </div>
+
 </div>
 
 <script src="js/main.js"></script>
+<script src="js/legend.js"></script>
 
 </html>
