@@ -58,20 +58,42 @@ Promise.all([
         .attr("stroke-dasharray", 2)
         .attr("d", path);
 
-    legend({
-  color: d3.scaleThreshold()
-        .domain([2, 4, 8, 16, 32, 64, 128, 256])
-        .range(['#8C0172',
-                '#922D55',
-                '#964D3E',
-                '#9A6E28',
-                '#9B951B',
-                '#89BC48',
-                '#6BD48C',
-                '#66E8D3',
-                '#B2F2FD']),
-  title: "New visits"
-})
+const tooltip = svg.append("g");
+
+  svg.selectAll(".blockfills")
+    .on("touchmove mousemove", function(event, d) {
+      tooltip.call(
+        callout,
+        `${d.properties.GEOID}`
+      );
+      tooltip.attr("transform", `translate(${d3.pointer(event, this)})`);
+      d3.select(this)
+        .attr("stroke", "#c7c7c7")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 0)
+        .raise();
+    })
+    .on("touchend mouseleave", function() {
+      tooltip.call(callout, null);
+      d3.select(this)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 0.25)
+        .attr("stroke-dasharray", 2)
+        .lower();
+    })
+
+    legend({color: d3.scaleThreshold()
+                     .domain([2, 4, 8, 16, 32, 64, 128, 256])
+                     .range(['#8C0172',
+                             '#922D55',
+                             '#964D3E',
+                             '#9A6E28',
+                             '#9B951B',
+                             '#89BC48',
+                             '#6BD48C',
+                             '#66E8D3',
+                             '#B2F2FD']),
+            title: "New visits"})
 
 });
 
