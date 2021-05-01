@@ -1,20 +1,68 @@
+source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_20.csv"
+
+
 $(document).ready(function(){
     $("input[type='radio']").click(function(){
         var supply = $("input[name='size']:checked").val();
-        var source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
+        source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
         if(supply){
           $('#supply').text(supply);
             console.log(source);
+
+            d3.csv(source,
+                   function(d) { d.weight = +d.weight;
+                                 d.forest_meme = +d.forest_meme;
+                                 d.forest_change = +d.forest_change;
+                                 d.difference = Math.abs(+d.forest_change - +d.forest_meme);
+                                 d.path = String(d.focal) + "-" + String(d.target);
+                                 return d}).then(function(data){
+
+                                   final = []
+  data.forEach(function(x) {
+                final.push({focal: x.focal,
+                                target: x.target,
+                                path: x.path,
+                                weight: x.weight,
+                                origin: get_coordinates.get(x.target),
+                                destination: get_coordinates.get(x.focal),
+                                difference: x.difference})
+  })
+
+                                 })
+
         }
     });
 });
 
 Promise.all([
   d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/blocks.json'),
-  d3.json('https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson')
-]).then(([blocks, background]) =>  {
+  d3.json('https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson'),
+  d3.csv(source,
+         function(d) { d.weight = +d.weight;
+                       d.forest_meme = +d.forest_meme;
+                       d.forest_change = +d.forest_change;
+                       d.difference = Math.abs(+d.forest_change - +d.forest_meme);
+                       d.path = String(d.focal) + "-" + String(d.target);
+                       return d})
+]).then(([blocks, background, data]) =>  {
   console.log(blocks)
   console.log(background)
+
+  get_coordinates = new Map(blocks.objects.blocks.geometries.map(function(d) {
+    return [d.properties.GEOID, [d.properties.X, d.properties.Y]]
+  }))
+
+  final = []
+data.forEach(function(x) {
+final.push({focal: x.focal,
+target: x.target,
+path: x.path,
+weight: x.weight,
+origin: get_coordinates.get(x.target),
+destination: get_coordinates.get(x.focal),
+difference: x.difference}) })
+
+
 
   var width = 800
   var height = 800
@@ -81,6 +129,48 @@ const tooltip = svg.append("g");
         .attr("stroke-dasharray", 2)
         .lower();
     })
+    .on("click", function(event, d) {
+
+      geoid = d.properties.GEOID;
+      $('#block').text(geoid);
+      svg.property('value', geoid);
+      svg.dispatch('input');
+
+      svg.selectAll("circle").remove()
+
+      let tempo = final.filter(function(d) { return d.focal == geoid })
+      let color = d3.scaleQuantize()
+            .domain([d3.min(tempo.map(function(d) { return +d.difference; })),
+                     d3.max(tempo.map(function(d) { return +d.difference; }))])
+            .range(['#8C0172',
+                    '#922D55',
+                    '#964D3E',
+                    '#9A6E28',
+                    '#9B951B',
+                    '#89BC48',
+                    '#6BD48C',
+                    '#66E8D3',
+                    '#B2F2FD']);
+
+      let size = d3.scaleSqrt()
+            .domain(d3.extent(tempo.map(function(d) { return +d.difference; })))
+            .range([2, 5]);
+
+      svg.append("g")
+         .selectAll("circle")
+         .data(tempo)
+         .join("circle")
+            .attr("class", "points")
+            .attr("transform", d => `translate(${projection(d.origin)})`)
+            .attr("r", function(d) { return size(d.difference) })
+            .attr('fill', function(d) { return color(d.difference) })
+            .attr("stroke", "white")
+            .attr("stroke-width", 1)
+            .attr("opacity", 1)
+         .append("title")
+            .text(d => d.name);
+
+    });
 
     legend({color: d3.scaleThreshold()
                      .domain([2, 4, 8, 16, 32, 64, 128, 256])
