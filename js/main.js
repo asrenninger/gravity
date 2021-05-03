@@ -3,7 +3,7 @@ geoid = "421010005001"
 
 d3.selectAll("input[type='radio']").on("change", function(){
 
-    var supply = $("input[name='size']:checked").val();
+    var supply =  this.value
     var source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
 
     console.log(this.value)
