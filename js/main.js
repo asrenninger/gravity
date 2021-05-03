@@ -1,38 +1,57 @@
 source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_20.csv"
+geoid = "421010005001"
 
+d3.selectAll("input[type='radio']").on("change", function(){
 
-$(document).ready(function(){
-    $("input[type='radio']").click(function(){
-        var supply = $("input[name='size']:checked").val();
-        source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
-        if(supply){
-          $('#supply').text(supply);
-            console.log(source);
+    var supply = $("input[name='size']:checked").val();
+    var source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
 
-            d3.csv(source,
-                   function(d) { d.weight = +d.weight;
-                                 d.forest_meme = +d.forest_meme;
-                                 d.forest_change = +d.forest_change;
-                                 d.difference = Math.abs(+d.forest_change - +d.forest_meme);
-                                 d.path = String(d.focal) + "-" + String(d.target);
-                                 return d}).then(function(data){
+    console.log(this.value)
+    $('#supply').text(supply);
 
-                                   final = []
-  data.forEach(function(x) {
-                final.push({focal: x.focal,
-                                target: x.target,
-                                path: x.path,
-                                weight: x.weight,
-                                origin: get_coordinates.get(x.target),
-                                destination: get_coordinates.get(x.focal),
-                                difference: x.difference})
-  })
+    d3.csv(source,
+           function(d) { d.weight = +d.weight;
+                         d.forest_meme = +d.forest_meme;
+                         d.forest_change = +d.forest_change;
+                         d.difference = Math.abs(+d.forest_change - +d.forest_meme) * 10;
+                         d.path = String(d.focal) + "-" + String(d.target);
+                         return d}).then(function(data){ final = reshape(data) })
 
-                                 })
-
-        }
-    });
 });
+
+//
+// $(document).ready(function(){
+//     $("input[type='radio']").click(function(){
+//         var supply = $("input[name='size']:checked").val();
+//         source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
+//         if(supply){
+//           $('#supply').text(supply);
+//             console.log(source);
+//
+//             d3.csv(source,
+//                    function(d) { d.weight = +d.weight;
+//                                  d.forest_meme = +d.forest_meme;
+//                                  d.forest_change = +d.forest_change;
+//                                  d.difference = Math.abs(+d.forest_change - +d.forest_meme);
+//                                  d.path = String(d.focal) + "-" + String(d.target);
+//                                  return d}).then(function(data){
+//
+//                                    final = []
+//   data.forEach(function(x) {
+//                 final.push({focal: x.focal,
+//                                 target: x.target,
+//                                 path: x.path,
+//                                 weight: x.weight,
+//                                 origin: get_coordinates.get(x.target),
+//                                 destination: get_coordinates.get(x.focal),
+//                                 difference: x.difference})
+//   })
+//
+//                                  })
+//
+//         }
+//     });
+// });
 
 Promise.all([
   d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/blocks.json'),
@@ -41,10 +60,11 @@ Promise.all([
          function(d) { d.weight = +d.weight;
                        d.forest_meme = +d.forest_meme;
                        d.forest_change = +d.forest_change;
-                       d.difference = Math.abs(+d.forest_change - +d.forest_meme);
+                       d.difference = Math.abs(+d.forest_change - +d.forest_meme) * 10;
                        d.path = String(d.focal) + "-" + String(d.target);
                        return d})
 ]).then(([blocks, background, data]) =>  {
+
   console.log(blocks)
   console.log(background)
 
@@ -52,17 +72,12 @@ Promise.all([
     return [d.properties.GEOID, [d.properties.X, d.properties.Y]]
   }))
 
-  final = []
-data.forEach(function(x) {
-final.push({focal: x.focal,
-target: x.target,
-path: x.path,
-weight: x.weight,
-origin: get_coordinates.get(x.target),
-destination: get_coordinates.get(x.focal),
-difference: x.difference}) })
+  final = reshape(data)
+  tempo = final.filter(function(d) { return d.focal == geoid })
 
-
+  headings = bearings(tempo)
+  binnings = bins(headings)
+  polar(binnings)
 
   var width = 800
   var height = 800
@@ -72,7 +87,6 @@ difference: x.difference}) })
     .append("svg")
     .attr("width", width)
     .attr("height", height)
-
 
   projection = d3.geoMercator()
     .fitSize([width, height], background)
@@ -138,19 +152,18 @@ const tooltip = svg.append("g");
 
       svg.selectAll("circle").remove()
 
-      let tempo = final.filter(function(d) { return d.focal == geoid })
-      let color = d3.scaleQuantize()
-            .domain([d3.min(tempo.map(function(d) { return +d.difference; })),
-                     d3.max(tempo.map(function(d) { return +d.difference; }))])
-            .range(['#8C0172',
-                    '#922D55',
-                    '#964D3E',
-                    '#9A6E28',
-                    '#9B951B',
-                    '#89BC48',
-                    '#6BD48C',
-                    '#66E8D3',
-                    '#B2F2FD']);
+      tempo = final.filter(function(d) { return d.focal == geoid })
+      let color = d3.scaleThreshold()
+                       .domain([2, 4, 8, 16, 32, 64, 128, 256])
+                       .range(['#8C0172',
+                               '#922D55',
+                               '#964D3E',
+                               '#9A6E28',
+                               '#9B951B',
+                               '#89BC48',
+                               '#6BD48C',
+                               '#66E8D3',
+                               '#B2F2FD']);
 
       let size = d3.scaleSqrt()
             .domain(d3.extent(tempo.map(function(d) { return +d.difference; })))
@@ -169,6 +182,18 @@ const tooltip = svg.append("g");
             .attr("opacity", 1)
          .append("title")
             .text(d => d.name);
+
+      var distance = d3.format(".1f")(d3.mean(tempo.map(function(d) { return ((d3.geoDistance(d.origin, d.destination) * 6378100) / 1000) * 0.621371 })))
+      var average = d3.format(".1f")(d3.mean(tempo.map(function(d) { return d.difference })))
+      var total = d3.format(".0f")(d3.sum(tempo.map(function(d) { return d.difference })))
+
+      $('#distance').text(distance);
+      $('#average').text(average);
+      $('#total').text(total);
+
+      headings = bearings(tempo)
+      binnings = bins(headings)
+      polar(binnings)
 
     });
 
