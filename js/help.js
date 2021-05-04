@@ -9,6 +9,8 @@ function reshape(data){
                  weight: x.weight,
                  origin: get_coordinates.get(x.target),
                  destination: get_coordinates.get(x.focal),
+                 meme: x.forest_meme,
+                 change: x.forest_change,
                  difference: x.difference}) })
 
   return final
@@ -37,7 +39,7 @@ function polar(binned){
     .align(0)
 
   var y = d3.scaleRadial()
-    .domain([0, d3.max(binned, d => d.count)])
+    .domain([0, d3.max(binned, d => d.change)])
     .range([inner, outer])
 
   var line = d3.lineRadial()
@@ -99,10 +101,20 @@ function polar(binned){
 
   svg.append("path")
      .attr("fill", "none")
-     .attr("stroke", '#000')
+     .attr("stroke", '#66E8D3')
      .attr("stroke-width", 10)
+     .attr("stroke-opacity", 1)
      .attr("d", line
-     .radius(d => y(d.count))
+     .radius(d => y(d.change))
+        (binned));
+
+  svg.append("path")
+     .attr("fill", "none")
+     .attr("stroke", '#8C0172')
+     .attr("stroke-width", 10)
+     .attr("stroke-opacity", 0.5)
+     .attr("d", line
+     .radius(d => y(d.meme))
         (binned));
 
   svg.append("g")
@@ -133,7 +145,8 @@ function bearings(filtered){
     const θ = Math.atan2(y, x);
     const bearing = (θ*180/Math.PI + 360) % 360;
 
-    return Math.round(bearing)
+    // return Math.round(bearing)
+    return bearing
 
   })
 
@@ -141,10 +154,21 @@ function bearings(filtered){
 
 }
 
-function bins(bearings){
+function bins(bearings, filtered){
 
-  var bins = d3.bin().thresholds(40)(bearings)
-  var binned = bins.map(function(d){ return {'bin': d3.mean([d.x0, d.x1]), 'count': d.length}})
+  var bins = d3.bin().thresholds(40)(bearings);
+
+  var m = new Map(d3.zip(bearings, filtered.map(function(d){ return d.meme })))
+  var c = new Map(d3.zip(bearings, filtered.map(function(d){ return d.change })))
+
+  var binned = bins.map(function(d){
+    return {
+      'bin': d3.mean([d.x0, d.x1]),
+      'meme': d3.sum(d.map(function(x){ return m.get(x) * 10 })),
+      'change': d3.sum(d.map(function(x){ return c.get(x) * 10 }))
+
+      }
+    })
 
   return binned
 

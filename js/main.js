@@ -76,7 +76,7 @@ Promise.all([
   tempo = final.filter(function(d) { return d.focal == geoid })
 
   headings = bearings(tempo)
-  binnings = bins(headings)
+  binnings = bins(headings, tempo)
   polar(binnings)
 
   var width = 800
@@ -192,7 +192,7 @@ const tooltip = svg.append("g");
       $('#total').text(total);
 
       headings = bearings(tempo)
-      binnings = bins(headings)
+      binnings = bins(headings, tempo)
       polar(binnings)
 
     });
