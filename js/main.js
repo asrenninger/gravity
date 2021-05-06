@@ -1,19 +1,18 @@
-source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_20.csv"
-geoid = "421010005001"
+source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_20_tracts.csv"
+geoid = "42101000500"
 
 d3.selectAll("input[type='radio']").on("change", function(){
 
     var supply =  this.value
-    var source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
+    var source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + "_tracts.csv"
 
     console.log(this.value)
     $('#supply').text(supply);
 
     d3.csv(source,
-           function(d) { d.weight = +d.weight;
-                         d.forest_meme = +d.forest_meme;
+           function(d) { d.forest_meme = +d.forest_meme;
                          d.forest_change = +d.forest_change;
-                         d.difference = Math.abs(+d.forest_change - +d.forest_meme) * 10;
+                         d.difference = +d.difference * 10;
                          d.path = String(d.focal) + "-" + String(d.target);
                          return d}).then(function(data){ final = reshape(data) })
 
@@ -54,13 +53,12 @@ d3.selectAll("input[type='radio']").on("change", function(){
 // });
 
 Promise.all([
-  d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/blocks.json'),
+  d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/tracts.json'),
   d3.json('https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson'),
   d3.csv(source,
-         function(d) { d.weight = +d.weight;
-                       d.forest_meme = +d.forest_meme;
+         function(d) { d.forest_meme = +d.forest_meme;
                        d.forest_change = +d.forest_change;
-                       d.difference = Math.abs(+d.forest_change - +d.forest_meme) * 10;
+                       d.difference = +d.difference * 10;
                        d.path = String(d.focal) + "-" + String(d.target);
                        return d})
 ]).then(([blocks, background, data]) =>  {
@@ -68,7 +66,7 @@ Promise.all([
   console.log(blocks)
   console.log(background)
 
-  get_coordinates = new Map(blocks.objects.blocks.geometries.map(function(d) {
+  get_coordinates = new Map(blocks.objects.tracts.geometries.map(function(d) {
     return [d.properties.GEOID, [d.properties.X, d.properties.Y]]
   }))
 
@@ -105,14 +103,14 @@ Promise.all([
 
     svg.append("g")
        .selectAll("path")
-       .data(topojson.feature(blocks, blocks.objects.blocks).features)
+       .data(topojson.feature(blocks, blocks.objects.tracts).features)
        .join("path")
         .attr("class", "blockfills")
         .attr("fill", "transparent")
         .attr("d", path);
 
     svg.append("path")
-        .datum(topojson.mesh(blocks, blocks.objects.blocks, (a, b) => a !== b))
+        .datum(topojson.mesh(blocks, blocks.objects.tracts, (a, b) => a !== b))
         .attr("class", "blocklines")
         .attr("fill", "none")
         .attr("stroke", "#fff")
@@ -154,7 +152,7 @@ const tooltip = svg.append("g");
 
       tempo = final.filter(function(d) { return d.focal == geoid })
       let color = d3.scaleThreshold()
-                       .domain([2, 4, 8, 16, 32, 64, 128, 256])
+                       .domain([20, 40, 80, 160, 320, 640, 1280, 2560])
                        .range(['#8C0172',
                                '#922D55',
                                '#964D3E',
@@ -198,7 +196,7 @@ const tooltip = svg.append("g");
     });
 
     legend({color: d3.scaleThreshold()
-                     .domain([2, 4, 8, 16, 32, 64, 128, 256])
+                     .domain([20, 40, 80, 160, 320, 640, 1280, 2560])
                      .range(['#8C0172',
                              '#922D55',
                              '#964D3E',

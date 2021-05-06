@@ -6,12 +6,11 @@ function reshape(data){
     final.push({ focal: x.focal,
                  target: x.target,
                  path: x.path,
-                 weight: x.weight,
                  origin: get_coordinates.get(x.target),
                  destination: get_coordinates.get(x.focal),
                  meme: x.forest_meme,
                  change: x.forest_change,
-                 difference: x.difference}) })
+                 difference: x.difference }) })
 
   return final
 
