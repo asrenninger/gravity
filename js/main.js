@@ -165,7 +165,7 @@ const tooltip = svg.append("g");
 
       let size = d3.scaleSqrt()
             .domain(d3.extent(tempo.map(function(d) { return +d.difference; })))
-            .range([2, 5]);
+            .range([1, 10]);
 
       svg.append("g")
          .selectAll("circle")
