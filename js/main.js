@@ -18,40 +18,6 @@ d3.selectAll("input[type='radio']").on("change", function(){
 
 });
 
-//
-// $(document).ready(function(){
-//     $("input[type='radio']").click(function(){
-//         var supply = $("input[name='size']:checked").val();
-//         source = "https://raw.githubusercontent.com/asrenninger/gravity/main/data/predictions_" + supply + ".csv"
-//         if(supply){
-//           $('#supply').text(supply);
-//             console.log(source);
-//
-//             d3.csv(source,
-//                    function(d) { d.weight = +d.weight;
-//                                  d.forest_meme = +d.forest_meme;
-//                                  d.forest_change = +d.forest_change;
-//                                  d.difference = Math.abs(+d.forest_change - +d.forest_meme);
-//                                  d.path = String(d.focal) + "-" + String(d.target);
-//                                  return d}).then(function(data){
-//
-//                                    final = []
-//   data.forEach(function(x) {
-//                 final.push({focal: x.focal,
-//                                 target: x.target,
-//                                 path: x.path,
-//                                 weight: x.weight,
-//                                 origin: get_coordinates.get(x.target),
-//                                 destination: get_coordinates.get(x.focal),
-//                                 difference: x.difference})
-//   })
-//
-//                                  })
-//
-//         }
-//     });
-// });
-
 Promise.all([
   d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/tracts.json'),
   d3.json('https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson'),
@@ -209,56 +175,3 @@ const tooltip = svg.append("g");
             title: "New visits"})
 
 });
-
-  // d3.json("https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson").then(function(data){
-  //
-  //   var width = 800
-  //   var height = 800
-  //
-  //   // The svg
-  //   var svg = d3.select("#base")
-  //     .append("svg")
-  //     .attr("width", width)
-  //     .attr("height", height)
-  //
-  //
-  //   projection = d3.geoMercator()
-  //     .fitSize([width, height], data)
-  //
-  //     // Draw the map
-  //     svg.append("g")
-  //         .selectAll("path")
-  //         .data(data.features)
-  //         .enter()
-  //         .append("path")
-  //           .attr("fill", "#000")
-  //           .attr("d", d3.geoPath()
-  //               .projection(projection)
-  //           )
-  //         .style("stroke", "none")
-  // })
-
-
-// // The svg
-// var svg = d3.select("svg"),
-//     width = +svg.attr("width"),
-//     height = +svg.attr("height");
-//
-// // Load external data and boot
-// d3.json("https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson").then(function(data){
-//
-//   projection = d3.geoMercator()
-//     .fitSize([width, height], data)
-//
-//     // Draw the map
-//     svg.append("g")
-//         .selectAll("path")
-//         .data(data.features)
-//         .enter()
-//         .append("path")
-//           .attr("fill", "#000")
-//           .attr("d", d3.geoPath()
-//               .projection(projection)
-//           )
-//         .style("stroke", "none")
-// })
