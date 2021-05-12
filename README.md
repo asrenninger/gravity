@@ -1,7 +1,7 @@
 # PREDICTING GROCERY TRIPS
 ### using gravity models to understand foot traffic
 
-**@AndrewRenninger** & **@KenSteif**
+**[@AndrewRenninger](https://twitter.com/AndrewRenninger)** & **[@KenSteif](https://twitter.com/KenSteif)**
 
 Here we use a random forest to predict the amount of foot traffic to different parts of Philadelphia. This model is meant to show the relationship between distance, supply and grocery trips. What happens to travel between areas of Philadelphia as the total supply of grocers—both as the number of shops and total square footage across shops—changes, given the distance between those areas? With the model trained on past trends, we then simulate the addition of new supply to the grocery market, adding 10, 20, or 30 thousand square feet to each Census block group to see how mobility changes with the addition of a new store. The results can be found in an interactive application [here](https://asrenninger.github.io/gravity/).  
 
@@ -9,7 +9,7 @@ Here we use a random forest to predict the amount of foot traffic to different p
 
 ### motivtaion
 
-Our goal is to create a scenario planning tool that models on how mobility responds to the supply of grocery stores in the city. The results give insights into which neighborhoods would see the largest gains from a new store and could allow planners to limit food deserts while giving residents more convenient options for groceries. As distance decreases or as supply increases, traffic between pairs of neighborhoods increases; this tool allows you too test different locations to see how travel patterns change. The strongest responses to new grocers occur in areas with limited existing grocery supply, and dimishing returns mean that areas that are already saturated with options see few new trips. Where is there pent up demand? What are the existing flows and how could we reduce travel? The application provides are tool to explore these results and these questions.       
+Our goal is to create a scenario planning tool that models how mobility responds to the supply of grocery stores in the city. The results give insights into which neighborhoods would see the largest gains from a new store and could allow planners to limit food deserts while giving residents more convenient options for groceries. As distance decreases or as supply increases, traffic between pairs of neighborhoods increases; this tool allows you too test different locations to see how travel patterns change. The strongest responses to new grocers occur in areas with limited existing grocery supply, and dimishing returns mean that areas that are already saturated with options see few new trips. Where is there pent up demand? What are the existing flows and how could we reduce travel? The application provides are tool to explore these results and these questions.       
 
 ### methodology
 
