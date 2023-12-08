@@ -20,7 +20,7 @@ d3.selectAll("input[type='radio']").on("change", function(){
 
 Promise.all([
   d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/tracts.json'),
-  d3.json('https://raw.githubusercontent.com/asrenninger/networks/master/data/processed/background.geojson'),
+  d3.json('https://raw.githubusercontent.com/asrenninger/gravity/main/data/background.geojson'), 
   d3.csv(source,
          function(d) { d.forest_meme = +d.forest_meme;
                        d.forest_change = +d.forest_change;
